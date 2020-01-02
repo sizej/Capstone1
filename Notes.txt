@@ -3,6 +3,9 @@ Questions to answer:
 - Relationship between critics reviews and results
 - Seasonality stuff
 - Are international films relaeased differently?
+- Which movies are most reviewed critically? By users? Anything
+  stand out in this?
+
 
 
 Things to remember:
@@ -13,3 +16,7 @@ Things to remember:
 - Genre is alphabetical - not primary, secondary, tertiary
 
 
+Approach for getting genre broken out
+- Convert genre column to lists
+- Make three columns for genre1, genre2, genre3 
+    - Could list comp this?

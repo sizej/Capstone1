@@ -1,0 +1,15 @@
+Questions to answer:
+
+- Relationship between critics reviews and results
+- Seasonality stuff
+- Are international films relaeased differently?
+
+
+Things to remember:
+
+- Inflation adjustment
+- Currency differences...
+- Fudged budget numbers
+- Genre is alphabetical - not primary, secondary, tertiary
+
+

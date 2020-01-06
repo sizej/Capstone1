@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd 
 import matplotlib.pyplot as plt 
 import movie_func as mf
+import datetime as dt 
 
 # import movies csv and filter down by following criteria:
 # 1. Has a USA gross income
@@ -19,6 +20,7 @@ m_df = movie_df[m1 & m2].copy().reset_index()
 m_df.rename(columns = {'worlwide_gross_income': 'ww_gross', 
                         'usa_gross_income': 'usa_gross',
                         'date_published': 'release_date',
+                        'actors': 'cast',
                         'reviews_from_users': 'user_reviews',
                         'reviews_from_critics': 'critics_reviews'}, inplace = True)
 
@@ -39,6 +41,20 @@ for x in m_df['genre']:
     for i in x:
         g1.append(i)
 genres = set(g1)
+
+# calculate performance metric (ww_gross / budget)
+m_df2 = m_df[m_df['budget'] != 'Not US'].copy()
+m_df2['perf_ratio'] = m_df2['ww_gross'] / m_df2['budget']
+# Adjust budget, ww_gross, and usa_gross for inflation
+m_df2['budget_IA'] = m_df2.apply(lambda row: mf.inflation_adjustment(row['budget'], row['release_date']), 
+                                axis = 1)
+
+# get some columns to breakdown movies across various times
+# by month, week, etc.
+m_df2['release_month'] = [x.month for x in m_df2['release_date']]
+m_df2['release_week'] = [x.timetuple().tm_yday // 7 for x in m_df2['release_date']]
+
+
 
 if __name__ == '__main__':
     pass

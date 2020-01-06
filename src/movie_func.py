@@ -17,13 +17,12 @@ inflation_df['CPI_mult'] = inflation_df['CPIAUCNS'].iloc[-1] / inflation_df['CPI
 end_date = max(inflation_df['DATE'])
 
 def inflation_adjustment(amt, date, end = end_date):
-    #breakpoint()
     if date < end:
         idx = min(np.where(inflation_df['DATE'] >= date)[0])
         adj = inflation_df['CPI_mult'][idx]
-        return (idx, amt * adj)
+        return amt * adj
     else:
-        return (0,amt)
+        return amt
         
 if __name__ == '__main__':
     pass

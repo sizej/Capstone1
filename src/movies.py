@@ -61,7 +61,8 @@ m_df2['budget_IA'] = m_df2.apply(lambda row: mf.inflation_adjustment(row['budget
 m_df2['ww_gross_IA'] = m_df2.apply(lambda row: mf.inflation_adjustment(row['ww_gross'], row['release_date']), 
                                 axis = 1)
 m_df2['usa_gross_IA'] = m_df2.apply(lambda row: mf.inflation_adjustment(row['usa_gross'], row['release_date']), 
-                                axis = 1)                            
+                                axis = 1)
+m_df2['profit'] = m_df2['ww_gross_IA'] - m_df2['budget_IA']                            
 
 # get some columns to breakdown movies across various times
 # by decade, year, month, week, etc.
@@ -71,6 +72,7 @@ m_df2['release_month'] = [x.month for x in m_df2['release_date']]
 m_df2['release_week'] = [x.timetuple().tm_yday // 7 for x in m_df2['release_date']]
 # 10 films released on/about NYE, move to week 51
 m_df2['release_week'] = [x if x != 52 else 51 for x in m_df2['release_week']]
+
 
 # Group by release week or release month and compare success rate
 rel_week_df = m_df2.groupby('release_week').agg({'is_success': 'sum',
@@ -90,6 +92,36 @@ ave_budget = sum(rel_week_df['total_budget']) / sum(rel_week_df['supply'])
 rel_week_df['mean_budget_norm'] = rel_week_df['mean_budget'] / ave_budget
 mean_supply = sum(rel_week_df['supply']) / len(rel_week_df['supply'])
 rel_week_df['supply_norm'] = rel_week_df['supply'] / mean_supply
+
+# Charts for intro/background
+# Revenue by week
+fig, ax = plt.subplots(1, 1, figsize = (8,6))
+x = np.arange(52)
+ax.bar(x, rel_week_df['total_ww_gross'], color = 'b', alpha = 0.5, label = 'WW Gross Revenue')
+ax.set_title('Worldwide Gross Revenue by Week')
+ax.set_yticklabels([f'${x:0.1f}B' for x in np.linspace(0, 3, 7)])
+plt.tight_layout(pad = 1)
+plt.savefig('images/revenue.jpeg')
+plt.close()
+# Budget by week
+fig, ax = plt.subplots(1, 1, figsize = (8,6))
+x = np.arange(52)
+ax.bar(x, rel_week_df['total_budget'], color = 'b', alpha = 0.5, label = 'Total Budget')
+ax.set_title('Total Budget by Week')
+ax.set_yticklabels([f'${x:0.0f}M' for x in np.linspace(0, 800, 5)])
+plt.tight_layout(pad = 1)
+plt.savefig('images/budget.jpeg')
+plt.close()
+# Profit by week
+fig, ax = plt.subplots(1, 1, figsize = (8,6))
+x = np.arange(52)
+ax.bar(x, rel_week_df['total_ww_gross'] - rel_week_df['total_budget'], color = 'b', alpha = 0.5, label = 'Profit')
+ax.set_title('Total Profit by Week')
+ax.set_yticklabels([f'${x:0.0f}B' for x in np.linspace(0, 25, 6)])
+plt.tight_layout(pad = 1)
+plt.savefig('images/profit.jpeg')
+plt.close()
+
 
 
 # get side-by-side comparison of success_rate, mean_budget, and supply

@@ -1,4 +1,23 @@
 
+# pie chart for fun
+lbl = ['Not September', 'September']
+data = [1,0]
+fig, ax = plt.subplots(1, 1, figsize = (6 ,6))
+ax.pie(data)
+ax.set_title('G-Rated Movies Release Month since 1990')
+ax.legend(lbl, loc = 'lower left')
+plt.tight_layout(pad = 2)
+plt.savefig('images/forkayla.jpeg')
+plt.close('all')
+
+# what percentage of most profitable week attributable to top 2....
+m1 = m_df2['release_week'] == 50
+week_50_profit = sum(m_df2['ww_gross_IA'][m1]) - sum(m_df2['budget_IA'][m1])
+avatar = m_df2['title'] == 'Avatar'
+star_wars = m_df2['title'] == 'Star Wars: Episode VII - The Force Awakens'
+top_2_profit = sum(m_df2['ww_gross_IA'][avatar | star_wars]) - sum(m_df2['budget_IA'][avatar | star_wars])
+print(top_2_profit / week_50_profit)
+
 # by decade....
 start = 1940
 end = 2010

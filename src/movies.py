@@ -44,9 +44,14 @@ for x in m_df['genre']:
         g1.append(i)
 genres = set(g1)
 
+# Set up dummy columns for set of genres
+for genre in genres:
+    col_name = 'is_' + genre
+    m_df[col_name] = m_df.apply(lambda row: mf.genre_col(genre, row['genre']), axis = 1)
+
 # calculate performance metric (ww_gross / budget)
 m_df2 = m_df[m_df['budget'] != 'Not US'].copy()
-m_df2['perf_ratio'] = m_df2['ww_gross'] / m_df2['budget']
+m_df2['perf_ratio'] = pd.to_numeric(m_df2['ww_gross'] / m_df2['budget'])
 success_threshold = 3
 m_df2['is_success'] = [1 if x >= success_threshold else 0 for x in m_df2['perf_ratio']]
 

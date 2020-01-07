@@ -12,6 +12,7 @@ Per the movie tracking website The Numbers:
 - Zero have been released in the month of September. Why not? Could it be the case that there is a pervasive belief that kids going back to school won't get to go to the movies?
 
 # THIS IS FOR YOU KAYLA
+![Pie chart of G-rated releases](https://github.com/sizej/Capstone1/blob/master/images/forkayla.jpeg)
 
 ## The Data
 

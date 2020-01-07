@@ -2,7 +2,7 @@
 # pie chart for fun
 lbl = ['Not September', 'September']
 data = [1,0]
-fig, ax = plt.subplots(1, 1, figsize = (6 ,6))
+fig, ax = plt.subplots(1, 1, figsize = (8, 6))
 ax.pie(data)
 ax.set_title('G-Rated Movies Release Month since 1990')
 ax.legend(lbl, loc = 'lower left')
@@ -63,8 +63,6 @@ plt.close()
 # ax.set_ylim(0, 100000000)
 # plt.savefig('images/perf_scatter.jpeg')
 # plt.close()
-
-
 
 # performance by genre, prime v not prime
 g_dict = {}

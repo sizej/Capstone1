@@ -47,8 +47,8 @@ genres = set(g1)
 # calculate performance metric (ww_gross / budget)
 m_df2 = m_df[m_df['budget'] != 'Not US'].copy()
 m_df2['perf_ratio'] = m_df2['ww_gross'] / m_df2['budget']
-m_df2['is_success_25'] = [1 if x >= 2.5 else 0 for x in m_df2['perf_ratio']]
-m_df2['is_success_4'] = [1 if x >= 4 else 0 for x in m_df2['perf_ratio']]
+success_threshold = 3
+m_df2['is_success'] = [1 if x >= success_threshold else 0 for x in m_df2['perf_ratio']]
 
 # Adjust budget, ww_gross, and usa_gross for inflation
 m_df2['budget_IA'] = m_df2.apply(lambda row: mf.inflation_adjustment(row['budget'], row['release_date']), 
@@ -66,33 +66,67 @@ m_df2['release_week'] = [x.timetuple().tm_yday // 7 for x in m_df2['release_date
 m_df2['release_week'] = [x if x != 52 else 51 for x in m_df2['release_week']]
 
 # Group by release week or release month and compare success rate
-rel_week_df = m_df2.groupby('release_week').agg({'is_success_25': 'sum',
-                                                'is_success_4': 'sum',
+rel_week_df = m_df2.groupby('release_week').agg({'is_success': 'sum',
                                                 'title': 'count',
                                                 'budget_IA': 'sum',
                                                 'ww_gross_IA': 'sum'})
-rwd_cols = {'is_success_25': 'successes_25',
-            'is_success_4': 'successes_4',
+rwd_cols = {'is_success': 'successes',
             'title': 'supply',
             'budget_IA': 'total_budget',
             'ww_gross_IA': 'total_ww_gross'}
 rel_week_df.rename(columns = rwd_cols, inplace = True)
+rel_week_df['success_rate'] = rel_week_df['successes'] / rel_week_df['supply']
+mean_success_rate = sum(rel_week_df['successes']) / sum(rel_week_df['supply'])
+rel_week_df['marg_success_rate'] = rel_week_df['success_rate'] / mean_success_rate
+rel_week_df['mean_budget'] = rel_week_df['total_budget'] / rel_week_df['supply']
+ave_budget = sum(rel_week_df['total_budget']) / sum(rel_week_df['supply'])
+rel_week_df['mean_budget_norm'] = rel_week_df['mean_budget'] / ave_budget
+mean_supply = sum(rel_week_df['supply']) / len(rel_week_df['supply'])
+rel_week_df['supply_norm'] = rel_week_df['supply'] / mean_supply
 
-rel_week_df['success_rate_25'] = rel_week_df['successes_25'] / rel_week_df['supply']
-rel_week_df['success_rate_4'] = rel_week_df['successes_4'] / rel_week_df['supply']
 
-# Create a stacked bar chart of film success by month
-fig, ax = plt.subplots(1,1, figsize = (8,6))
-xloc = np.arange(len(rel_week_df['success_rate_25']))
-ax.plot(xloc, rel_week_df['success_rate_25'], label = '250% Success Rate')
-ax.plot(xloc, rel_week_df['success_rate_4'], label = '400% Success Rate')
-ax.legend()
-plt.savefig('images/test.jpeg')
+# get side-by-side comparison of success_rate, mean_budget, and supply
+fig, ax = plt.subplots(3,1, figsize = (14, 10))
+xloc = np.arange(len(rel_week_df['supply']))
+ax[0].bar(xloc, rel_week_df['success_rate'], color = 'b', alpha = 0.5, label = 'Success Rate')
+ax[0].set_title('Success Rate')
+ax[0].axhline(sum(rel_week_df['successes']) / sum(rel_week_df['supply']), color = 'r', linestyle = '--', linewidth = 2)
+ax[0].axvline(19.5, color = 'r', linestyle = '--', linewidth = 2)
+ax[0].axvline(32.5, color = 'r', linestyle = '--', linewidth = 2)
+ax[0].axvline(46.5, color = 'r', linestyle = '--', linewidth = 2)
+ax[0].axvline(51.5, color = 'r', linestyle = '--', linewidth = 2)
+ax[1].bar(xloc, rel_week_df['mean_budget'], color = 'b', alpha = 0.5, label = 'Mean Budget')
+ax[1].set_title('Mean Budget per Film')
+ax[1].axhline(sum(rel_week_df['total_budget']) / sum(rel_week_df['supply']), color = 'r', linestyle = '--', linewidth = 2)
+ax[1].axvline(19.5, color = 'r', linestyle = '--', linewidth = 2)
+ax[1].axvline(32.5, color = 'r', linestyle = '--', linewidth = 2)
+ax[1].axvline(46.5, color = 'r', linestyle = '--', linewidth = 2)
+ax[1].axvline(51.5, color = 'r', linestyle = '--', linewidth = 2)
+ax[2].bar(xloc, rel_week_df['supply'], color = 'b', alpha = 0.5, label = 'Count of Films Released')
+ax[2].set_title('Count of Films Released')
+ax[2].axhline(sum(rel_week_df['supply']) / len(rel_week_df['supply']), color = 'r', linestyle = '--', linewidth = 2)
+ax[2].axvline(19.5, color = 'r', linestyle = '--', linewidth = 2)
+ax[2].axvline(32.5, color = 'r', linestyle = '--', linewidth = 2)
+ax[2].axvline(46.5, color = 'r', linestyle = '--', linewidth = 2)
+ax[2].axvline(51.5, color = 'r', linestyle = '--', linewidth = 2)
+plt.tight_layout(pad = 2)
+plt.savefig('images/comparison.jpeg')
+plt.close()
 
-fig, ax = plt.subplots(1,1, figsize = (12,5))
-ax.bar(xloc, rel_week_df['successes_25'], color = 'blue')
-ax.bar(xloc, rel_week_df['supply'], color = 'orange', bottom = rel_week_df['successes_25'])
-plt.savefig('images/stack_test.jpeg')
+# Calculate the differences between success and budget/supply
+diff1 = rel_week_df['marg_success_rate'] - rel_week_df['mean_budget_norm'] 
+c1 = ['g' if x > 0 else 'r' for x in diff1]
+diff2 = rel_week_df['marg_success_rate'] - rel_week_df['supply_norm']
+c2 = ['g' if x > 0 else 'r' for x in diff2]
+
+# Create a horizontal bar chart for the differences....
+fig, ax = plt.subplots(1,2, figsize = (10,14))
+xloc = np.arange(len(rel_week_df['mean_budget_norm']))
+ax[0].barh(xloc[::-1], diff1[::-1], align = 'center', alpha = 0.4, color = c1, label = 'Success v Budget')
+ax[1].barh(xloc[::-1], diff2[::-1], align = 'center', alpha = 0.4, color = c2, label = 'Success v Supply')
+plt.legend()
+plt.savefig('images/differences.jpeg')
+plt.close()
 
 
 if __name__ == '__main__':

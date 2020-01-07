@@ -23,6 +23,14 @@ def inflation_adjustment(amt, date, end = end_date):
         return amt * adj
     else:
         return amt
+
+def determine_prime(week, starts, ends):
+    prime = 0
+    for i in range(len(starts)):
+        if starts[i] <= week <= ends[i]:
+            prime = 1
+            break
+    return prime
         
 if __name__ == '__main__':
     pass

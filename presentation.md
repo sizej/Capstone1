@@ -53,6 +53,11 @@ Thus, for the purposes of this analysis, it makes more sense to focus on commerc
 
 ## Hypothesis Test #1 - Prime Window
 
+| Status | Successes | Attempts | Success Rate |
+| --- | --- | --- | --- |
+| Prime | 660 | 2143 | 0.308 |
+| Not Prime | 1328  | 4973 | 0.267 |
+
 1. Null hypothesis is that prime window success rate is equal to not prime window success rate. Alternative hypothesis is that the prime window success rate is greater than not prime.
 
 2. One tailed z-test, alpha = 0.05
@@ -63,8 +68,45 @@ Thus, for the purposes of this analysis, it makes more sense to focus on commerc
 
 ## Hypothesis Test #2 - Competitive Effect
 
+To examine the role of supply (or competition) in film success, I used the count of films released the week before, the week of, and the week after a film's release, so for every film in the dataset, we know how many 'competitors' it has. I chose this window because the lion's share of a film's theatrical revenue comes in the first two weekends. I chose to break the dataset into three parts - low competition (~27%), high competition (~25%), and middle competition (~48%). 
+
+![Histogram of competitors](images/competitor_hist.jpeg)
+
+| Competition | Successes | Attempts | Success Rate |
+| --- | --- | --- | --- |
+| Low | 362 | 943 | 0.384 |
+| Middle | 916 | 3287 | 0.279 |
+| High | 710 | 2886 | 0.246 |
 
 
+I then performed two hypothesis tests - low vs. middle and high vs. middle. Since I am doing two comparisons, I used an alpha of 0.025 (Bonferroni correction for an alpha of 0.05).
 
+#### Hypothesis Test #2A - Low v. Middle
 
+1. Null Hypothesis: Success rate for low competition films is equal to success rate for middle competition films. Alternate hypothesis is that low competition films outperform middle competition films.
 
+2. One tailed z-test, alpha = 0.025
+
+3. z-score = 6.229, test_statistic = 2.344e-10
+
+4. Reject the null - low competition films outperform middle competition films.
+
+#### Hypothesis Test #2B - High v. Middle
+
+1. Null Hypothesis: Success rate for high competition films is equal to success rate for middle competition films. Alternate hypothesis is that high competition films underperform middle competition films.
+
+2. One tailed z-test, alpha = 0.025
+
+3. z-score = -2.908, test_statistic = 0.002
+
+4. Reject the null - high competition films underperform middle competition films.
+
+That seasonality and competitive set are significant is (potentially) unsurprising. The surprising thing was how significant the results were, which led me to consider why this might the case. The first thing that came to mind was time. Older films have much higher success rates:
+
+![Success Rate over time](images/years.jpeg)
+
+Indeed, the mean year for the low competititon films is 1986; for the high competition films, the mean year is 2008.
+
+#### Hypthesis Test #3 - Competitive Effect - Films since 2000
+
+I filtered down the dataset to just films released this century. 

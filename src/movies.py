@@ -177,5 +177,7 @@ m_df2['is_prime'] = m_df2.apply(lambda row: mf.determine_prime(row['release_week
 # create competitive films column (films released week before and week after)
 m_df2['competitors'] = m_df2.apply(lambda row: mf.competitor_count(row['release_week'], row['release_year'], m_df2), axis = 1)
 
+m_df2.to_csv('data/clean_movies.csv')
+
 if __name__ == '__main__':
     pass

@@ -33,19 +33,31 @@ In order to understand the effects of seasonality on film performance, I filtere
 - The film's budget must be denominated in USD. Foreign-produced films are beyond the scope of this analysis.
 - The film must have a reported US Gross revenue. If a film was made here, but never released here, it is also beyond the scope of this analysis.
 - The film was released in 1970 or later. This cuts out the oldest 120 movies - from a time when far fewer films came out and there was much less competition.
-The resulting dataset is some 7100 films, dating from 1970 to 2019.
+The resulting dataset is ~7100 films, dating from 1970 to 2019.
 
 ## Initial Observations
 
-Total revenue over the course of the year
+I wanted to see if we could observe seasonality across the course of the year, so I aggregated total revenue by week of the year (0 - 51).
 
-Total budget over the course of the year
+![Total revenue over the year](images/revenue.jpeg)
 
-Count of Releases over the course of the year
+I also wondered if higher budget movies are released in any sort of seasonal patter, so I plotted total budget by release week, as well.
 
-In some ways, the movie business is resistant to analysis of raw numbers; real success is all about outliers. It only takes one *Titanic* to pay for a lot of *Sharknados*. 
+![Total budget over the year](images/budget.jpeg)
 
-For example, the most profitable week of the year is week 50 (Christmas week). In the dataset, there are 133 films released in week 50, but **about 20% (or roughly $5B) of the total profit** of that week is attributable to two films, *Avatar* and *Star Wars: Episode VII*. Massive hits are by definition outliers (and outliers are hard to predict or analyze). Further, even focusing on 'return' alone can be challenging. For example, *The Blair Witch Project* made ~$250M on its paltry $60k budget (roughly a 416,667% return).
+The difference here would be commonly conceived of as the profit:
+
+![Total profit over the year](images/profit.jpeg)
+
+But, this doesn't really tell the whole story for a couple of reasons. First, the publicly available data for the budget of a film does not include any costs other than the production of the film itself. It excludes marketing costs (a HUGE number - commonly considered to be 75-100% of the budget of the film) and all other overhead. 
+
+Second, wildly successful films play an outsized role in profit generation. In some ways, the movie business is resistant to analysis of raw numbers; real success is all about outliers. It only takes one *Titanic* to pay for a lot of *Sharknados*. 
+
+|![Titanic](images/titanic.jpg) | == | ![Sharknado](images/sharknado_grid.jpg)
+
+For example, the most profitable week of the year is week 50 (Christmas week). In the dataset, there are 133 films released in week 50, but **about 20% (or roughly $5B) of the total profit** of that week is attributable to two films, *Avatar* and *Star Wars: Episode VII*. Massive hits are by definition outliers (and outliers are hard to predict or analyze). 
+
+Further, even focusing on 'return' alone can be challenging. For example, *The Blair Witch Project* made ~$250M on its paltry $60k budget (roughly a 416,667% return).
 
 Thus, for the purposes of this analysis, it makes more sense to focus on commercial success - that is, sufficient return on the investment. Using both my own experience and a small survey of people in the industry, I landed on a threshold of three times the budget in order for a film to be considered commercially successful.
 
@@ -68,7 +80,7 @@ Thus, for the purposes of this analysis, it makes more sense to focus on commerc
 
 ## Hypothesis Test #2 - Competitive Effect
 
-To examine the role of supply (or competition) in film success, I used the count of films released the week before, the week of, and the week after a film's release, so for every film in the dataset, we know how many 'competitors' it has. I chose this window because the lion's share of a film's theatrical revenue comes in the first two weekends. I chose to break the dataset into three parts - low competition (~27%), high competition (~25%), and middle competition (~48%). 
+To examine the role of supply (or competition) in film success, I used the count of films released the week before, the week of, and the week after a film's release, so for every film in the dataset, we know how many 'competitors' it has. I chose this window because the lion's share of a film's theatrical revenue comes in the first two weekends. I chose to break the dataset into three parts - low competition (~27% of weeks), high competition (~25% of weeks), and middle competition (~48% of weeks). 
 
 ![Histogram of competitors](images/competitor_hist.jpeg)
 
@@ -83,23 +95,23 @@ I then performed two hypothesis tests - low vs. middle and high vs. middle. Sinc
 
 #### Hypothesis Test #2A - Low v. Middle
 
-1. Null Hypothesis: Success rate for low competition films is equal to success rate for middle competition films. Alternate hypothesis is that low competition films outperform middle competition films.
+- Null Hypothesis: Success rate for low competition films is equal to success rate for middle competition films. Alternate hypothesis is that low competition films outperform middle competition films.
 
-2. One tailed z-test, alpha = 0.025
+- One tailed z-test, alpha = 0.025
 
-3. z-score = 6.229, test_statistic = 2.344e-10
+- z-score = 6.229, test_statistic = 2.344e-10
 
-4. Reject the null - low competition films outperform middle competition films.
+- Reject the null - low competition films outperform middle competition films.
 
 #### Hypothesis Test #2B - High v. Middle
 
-1. Null Hypothesis: Success rate for high competition films is equal to success rate for middle competition films. Alternate hypothesis is that high competition films underperform middle competition films.
+- Null Hypothesis: Success rate for high competition films is equal to success rate for middle competition films. Alternate hypothesis is that high competition films underperform middle competition films.
 
-2. One tailed z-test, alpha = 0.025
+- One tailed z-test, alpha = 0.025
 
-3. z-score = -2.908, test_statistic = 0.002
+- z-score = -2.908, test_statistic = 0.002
 
-4. Reject the null - high competition films underperform middle competition films.
+- Reject the null - high competition films underperform middle competition films.
 
 That seasonality and competitive set are significant is (potentially) unsurprising. The surprising thing was how significant the results were, which led me to consider why this might the case. The first thing that came to mind was time. Older films have much higher success rates:
 
@@ -107,6 +119,34 @@ That seasonality and competitive set are significant is (potentially) unsurprisi
 
 Indeed, the mean year for the low competititon films is 1986; for the high competition films, the mean year is 2008.
 
-#### Hypthesis Test #3 - Competitive Effect - Films since 2000
+## Hypthesis Test #3 - Competitive Effect - Films since 2000
 
-I filtered down the dataset to just films released this century. 
+I filtered down the dataset to just films released this century, some 4600 films. Same as above, I broke the dataset into three parts (low, middle, and high competitive weeks).
+
+![Histogram of Competitive Weeks](images/competitor_hist_2000.jpeg)
+
+| Competition | Successes | Attempts | Success Rate |
+| --- | --- | --- | --- |
+| Low | 252 | 731 | 0.345 |
+| Middle | 736 | 2610 | 0.282 |
+| High | 290 | 1267 | 0.229 |
+
+#### Hypothesis Test #3A - Low v. Mid for the 2000s
+
+- Null hypothesis is that success rate of low competition films is the same as middle competition films. Alternative is that low competition films outperform middle competition films.
+
+- One tailed z-test, alpha = 0.025
+
+- z-score = 3.29, test_statistic = 0.0005
+
+- Reject the null - low competition films outperform middle competition films
+
+#### Hypothesis Test #3B - High v. Mid for the 2000s
+
+- Null hypothesis is that success rate of high competition films is the same as middle competition films. Alternative is that high competition films underperform middle competition films.
+
+- One tailed z-test, alpha = 0.025
+
+- z-score = 3.29, test_statistic = 0.0005
+
+- Reject the null - high competition films underperform middle competition films

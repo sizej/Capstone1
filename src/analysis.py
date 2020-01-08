@@ -1,5 +1,9 @@
 import scipy.stats as stats
 from statsmodels.stats.weightstats import ztest
+import pandas as pd 
+
+m_df2 = pd.read_csv('data/clean_movies.csv')
+
 
 # pie chart for fun
 lbl = ['Not September', 'September']

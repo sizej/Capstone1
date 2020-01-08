@@ -20,3 +20,23 @@ Approach for getting genre broken out
 - Convert genre column to lists
 - Make three columns for genre1, genre2, genre3 
     - Could list comp this?
+
+
+Hypotheses for testing:
+
+1. Prime v not prime
+    - H[0] = No difference between prime and gen pop
+    - H[A] = There is a difference (probably that prime is better,
+    i.e. a right tailed test)
+2. Competitors matter
+    - Harder to say what the hypothese are here
+    - Believe that more than average and less than average have an
+    effect
+    - Does this turn into 2 hypothesis tests? Do I test more than one
+    set of thresholds for what is high or low? 
+    - Seems to me that comparing all of them would create a situation
+    where it would be very hard to get a significant result. Maybe grouping 
+    them would be better. I could group by 1 or 2 sds out?
+        - Would need to get the SD from a group by release week and release
+        year to get rid of double-counting
+        - Ask about this in the morning

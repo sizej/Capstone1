@@ -64,7 +64,7 @@ def competitor_count(week, year, df):
         weeks = [week - 1, week, week + 1]
         m1 = df['release_week'].isin(weeks)
         m2 = df['release_year'] == year
-        return df['title'][m1 & m2].count()
+        return df['title'][m1 & m2].count() - 1
     elif week == 0:
         m1a = df['release_week'] == 51
         m1b = df['release_year'] == year - 1
@@ -72,7 +72,7 @@ def competitor_count(week, year, df):
         m2a = df['release_week'].isin([0,1])
         m2b = df['release_year'] == year
         m2 = m2a & m2b
-        return df['title'][m1 | m2].count()
+        return df['title'][m1 | m2].count() - 1
     elif week == 51:
         m1a = df['release_week'] == 0
         m1b = df['release_year'] == year + 1
@@ -80,7 +80,7 @@ def competitor_count(week, year, df):
         m2a = df['release_week'].isin([50,51])
         m2b = df['release_year'] == year
         m2 = m2a & m2b
-        return df['title'][m1 | m2].count()
+        return df['title'][m1 | m2].count() - 1
         
 if __name__ == '__main__':
     pass

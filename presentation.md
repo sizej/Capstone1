@@ -53,7 +53,7 @@ But, this doesn't really tell the whole story for a couple of reasons. First, th
 
 Second, wildly successful films play an outsized role in profit generation. In some ways, the movie business is resistant to analysis of raw numbers; real success is all about outliers. It only takes one *Titanic* to pay for a lot of *Sharknados*. 
 
-|![Titanic](images/titanic.jpg) | == | ![Sharknado](images/Sharknado_grid.jpeg)
+|![Titanic](images/titanic.jpg) | == | ![Sharknado](images/Sharknado_grid.jpg)
 
 For example, the most profitable week of the year is week 50 (Christmas week). In the dataset, there are 133 films released in week 50, but **about 20% (or roughly $5B) of the total profit** of that week is attributable to two films, *Avatar* and *Star Wars: Episode VII*. Massive hits are by definition outliers (and outliers are hard to predict or analyze). 
 

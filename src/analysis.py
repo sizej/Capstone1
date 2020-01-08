@@ -78,14 +78,14 @@ for genre in genres:
 
 fig, ax = plt.subplots(1, 1, figsize = (12, 8))
 xloc = np.arange(len(g_dict))
-width = 0.5
+width = 0.4
 ax.bar(xloc, [x['prime'] for x in g_dict.values()], width = width, color = 'b', alpha = 0.5, label = 'Prime')
-ax.bar(xloc + width, [x['not_prime'] for x in g_dict.values()], width = width, color = 'r', alpha = 0.5, label = 'Prime')
+ax.bar(xloc + width, [x['not_prime'] for x in g_dict.values()], width = width, color = 'r', alpha = 0.5, label = 'Not Prime')
 ax.set_xticks(xloc)
 ax.set_xticklabels(genres, rotation = 45)
 ax.legend()
-ax.set_title(' ')
-plt.tight_layout(pad = 1)
+ax.set_title('Success Rate by Genre - Prime v Not Prime')
+plt.tight_layout(pad = 2)
 plt.savefig('images/genre_bar.jpeg')
 plt.close()
 

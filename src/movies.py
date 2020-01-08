@@ -50,7 +50,9 @@ for genre in genres:
     m_df[col_name] = m_df.apply(lambda row: mf.genre_col(genre, row['genre']), axis = 1)
 
 # calculate performance metric (ww_gross / budget)
-m_df2 = m_df[m_df['budget'] != 'Not US'].copy()
+m1 = m_df['budget'] != 'Not US'
+m2 = m_df['release_date'] >= dt.dateime(1970, 1, 1)
+m_df2 = m_df[m1 & m2].copy()
 m_df2['perf_ratio'] = pd.to_numeric(m_df2['ww_gross'] / m_df2['budget'])
 success_threshold = 3
 m_df2['is_success'] = [1 if x >= success_threshold else 0 for x in m_df2['perf_ratio']]

@@ -32,7 +32,8 @@ In order to understand the effects of seasonality on film performance, I filtere
 - The film must have a reported budget without which the could be no analysis of profitability/performance.
 - The film's budget must be denominated in USD. Foreign-produced films are beyond the scope of this analysis.
 - The film must have a reported US Gross revenue. If a film was made here, but never released here, it is also beyond the scope of this analysis.
-The resulting dataset is some 7200 films, dating from 1920 to 2019.
+- The film was released in 1970 or later. This cuts out the oldest 120 movies - from a time when far fewer films came out and there was much less competition.
+The resulting dataset is some 7100 films, dating from 1970 to 2019.
 
 ## Initial Observations
 

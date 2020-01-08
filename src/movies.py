@@ -51,7 +51,7 @@ for genre in genres:
 
 # calculate performance metric (ww_gross / budget)
 m1 = m_df['budget'] != 'Not US'
-m2 = m_df['release_date'] >= dt.dateime(1970, 1, 1)
+m2 = m_df['release_date'] >= dt.datetime(1970, 1, 1)
 m_df2 = m_df[m1 & m2].copy()
 m_df2['perf_ratio'] = pd.to_numeric(m_df2['ww_gross'] / m_df2['budget'])
 success_threshold = 3
@@ -88,10 +88,10 @@ rwd_cols = {'is_success': 'successes',
 rel_week_df.rename(columns = rwd_cols, inplace = True)
 rel_week_df['success_rate'] = rel_week_df['successes'] / rel_week_df['supply']
 mean_success_rate = sum(rel_week_df['successes']) / sum(rel_week_df['supply'])
-rel_week_df['marg_success_rate'] = rel_week_df['success_rate'] / mean_success_rate
+rel_week_df['success_rate_norm'] = rel_week_df['success_rate'] / mean_success_rate
 rel_week_df['mean_budget'] = rel_week_df['total_budget'] / rel_week_df['supply']
-ave_budget = sum(rel_week_df['total_budget']) / sum(rel_week_df['supply'])
-rel_week_df['mean_budget_norm'] = rel_week_df['mean_budget'] / ave_budget
+mean_budget = sum(rel_week_df['total_budget']) / sum(rel_week_df['supply'])
+rel_week_df['mean_budget_norm'] = rel_week_df['mean_budget'] / mean_budget
 mean_supply = sum(rel_week_df['supply']) / len(rel_week_df['supply'])
 rel_week_df['supply_norm'] = rel_week_df['supply'] / mean_supply
 

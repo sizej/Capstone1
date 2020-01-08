@@ -51,4 +51,20 @@ Thus, for the purposes of this analysis, it makes more sense to focus on commerc
 
 **The big question is whether or not seasonality drives film success more than supply, or at least whether they are close to equally important**
 
-## 
+## Hypothesis Test #1 - Prime Window
+
+1. Null hypothesis is that prime window success rate is equal to not prime window success rate. Alternative hypothesis is that the prime window success rate is greater than not prime.
+
+2. One tailed z-test, alpha = 0.05
+
+3. z-score = 3.53, test_statistic = 0.0004
+
+4. Reject the null - prime window does outperfom not prime window
+
+## Hypothesis Test #2 - Competitive Effect
+
+
+
+
+
+

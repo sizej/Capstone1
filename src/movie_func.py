@@ -47,12 +47,10 @@ def determine_prime(week, starts, ends):
     '''
     Determines if date falls inside of a 'prime' window
     '''
-    prime = 0
     for i in range(len(starts)):
         if starts[i] <= week <= ends[i]:
-            prime = 1
-            break
-    return prime
+            return 1
+    return 0
 
 def competitor_count(week, year, df):
     '''

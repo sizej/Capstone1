@@ -122,8 +122,6 @@ plt.tight_layout(pad = 1)
 plt.savefig('images/profit.jpeg')
 plt.close()
 
-
-
 # get side-by-side comparison of success_rate, mean_budget, and supply
 pw_starts = [19.5, 46.5]
 pw_ends = [32.5, 51.5]
@@ -148,10 +146,10 @@ ax[1].axvline(pw_ends[1], color = 'r', linestyle = '--', linewidth = 2)
 ax[2].bar(xloc, rel_week_df['supply'], color = c, alpha = 0.5, label = 'Count of Films Released')
 ax[2].set_title('Count of Films Released')
 ax[2].axhline(sum(rel_week_df['supply']) / len(rel_week_df['supply']), color = 'r', linestyle = '--', linewidth = 2)
-ax[1].axvline(pw_starts[0], color = 'r', linestyle = '--', linewidth = 2)
-ax[1].axvline(pw_ends[0], color = 'r', linestyle = '--', linewidth = 2)
-ax[1].axvline(pw_starts[1], color = 'r', linestyle = '--', linewidth = 2)
-ax[1].axvline(pw_ends[1], color = 'r', linestyle = '--', linewidth = 2)
+ax[2].axvline(pw_starts[0], color = 'r', linestyle = '--', linewidth = 2)
+ax[2].axvline(pw_ends[0], color = 'r', linestyle = '--', linewidth = 2)
+ax[2].axvline(pw_starts[1], color = 'r', linestyle = '--', linewidth = 2)
+ax[2].axvline(pw_ends[1], color = 'r', linestyle = '--', linewidth = 2)
 plt.tight_layout(pad = 2)
 plt.savefig('images/comparison.jpeg')
 plt.close()
@@ -174,6 +172,8 @@ m_df2['is_prime'] = m_df2.apply(lambda row: mf.determine_prime(row['release_week
 # plt.savefig('images/differences.jpeg')
 # plt.close()
 
+# create competitive films column (films released week before and week after)
+m_df2['competitors'] = m_df2.apply(lambda row: mf.competitor_count(row['release_week'], row['release_year'], m_df2), axis = 1)
 
 if __name__ == '__main__':
     pass

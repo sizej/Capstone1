@@ -44,9 +44,9 @@ Count of Releases over the course of the year
 
 In some ways, the movie business is resistant to analysis of raw numbers; real success is all about outliers. It only takes one *Titanic* to pay for a lot of *Sharknados*. 
 
-For example, the most profitable week of the year is week 50 (Christmas week). In the dataset, there are 133 films released in week 50, but **about 20% (or roughly $5B) of the total profit** of that week is attributable to two films, *Avatar* and *Star Wars: Episode VII*. Massive hits are by definition outliers (and outliers are hard to predict or analyze).
+For example, the most profitable week of the year is week 50 (Christmas week). In the dataset, there are 133 films released in week 50, but **about 20% (or roughly $5B) of the total profit** of that week is attributable to two films, *Avatar* and *Star Wars: Episode VII*. Massive hits are by definition outliers (and outliers are hard to predict or analyze). Further, even focusing on 'return' alone can be challenging. For example, *The Blair Witch Project* made ~$250M on its paltry $60k budget (roughly a 416,667% return).
 
-For the purposes of this analysis, it makes more sense to focus on commercial success - that is, a good return on the investment. Using both my own experience and a small survey of people in the industry, I landed on a threshold of three times the budget in order for a film to be considered commercially successful.
+Thus, for the purposes of this analysis, it makes more sense to focus on commercial success - that is, sufficient return on the investment. Using both my own experience and a small survey of people in the industry, I landed on a threshold of three times the budget in order for a film to be considered commercially successful.
 
 **The big question is whether or not seasonality drives film success more than supply, or at least whether they are close to equally important**
 

@@ -53,6 +53,34 @@ def determine_prime(week, starts, ends):
             prime = 1
             break
     return prime
+
+def competitor_count(week, year, df):
+    '''
+    Returns the competitive set for a film, given the release week and release year.
+    Competitive set is defined as count of movies that came out the same week, one week,
+    before, and one week after
+    '''
+    if 0 < week < 51:
+        weeks = [week - 1, week, week + 1]
+        m1 = df['release_week'].isin(weeks)
+        m2 = df['release_year'] == year
+        return df['title'][m1 & m2].count()
+    elif week == 0:
+        m1a = df['release_week'] == 51
+        m1b = df['release_year'] == year - 1
+        m1 = m1a & m1b
+        m2a = df['release_week'].isin([0,1])
+        m2b = df['release_year'] == year
+        m2 = m2a & m2b
+        return df['title'][m1 | m2].count()
+    elif week == 51:
+        m1a = df['release_week'] == 0
+        m1b = df['release_year'] == year + 1
+        m1 = m1a & m1b
+        m2a = df['release_week'].isin([50,51])
+        m2b = df['release_year'] == year
+        m2 = m2a & m2b
+        return df['title'][m1 | m2].count()
         
 if __name__ == '__main__':
     pass

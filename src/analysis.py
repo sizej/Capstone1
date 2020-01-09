@@ -78,6 +78,7 @@ test_statistic = 1 - stats.norm.cdf(z, 0, 1)
 ss_z_score, ss_test_stat = ztest(prime_results, not_prime_results, value = 0, alternative = 'larger')
 
 # hypothesis test #2 - does a lot of competition matter - 2 comparisons low v mid, high v mid
+competitor_df = m_df2.groupby(['release_year', 'release_week']).agg({'competitors': 'mean'})
 high_comp_threshold = 13
 low_comp_threshold = 5
 m1 = competitor_df['competitors'] <= low_comp_threshold
@@ -89,11 +90,10 @@ all_count = competitor_df.count()
 print(low_comp_count/all_count, high_comp_count / all_count)
 
 fig, ax = plt.subplots(1, 1, figsize = (8,6))
-competitor_df = m_df2.groupby(['release_year', 'release_week']).agg({'competitors': 'mean'})
 ax.hist(competitor_df['competitors'], bins = 25, color = 'b', alpha = 0.5, align = 'mid')
 ax.axvline(low_comp_threshold, color = 'r', linestyle = '--', linewidth = 2)
 ax.axvline(high_comp_threshold, color = 'r', linestyle = '--', linewidth = 2)
-ax.set_title('Competitors per Week')
+ax.set_title('Weeks with Competitors since 1970')
 plt.savefig('images/competitor_hist.jpeg')
 plt.close()
 
@@ -107,16 +107,35 @@ mid_comp_results = m_df2['is_success'][-m1 & -m2]
 low_z_score, low_test_stat = ztest(low_comp_results, mid_comp_results, value = 0, alternative = 'larger')
 high_z_score, high_test_stat = ztest(high_comp_results, mid_comp_results, value = 0, alternative = 'smaller')
 
+# Break out 2000s for separate hypo test
+m1 = m_df2['release_year'] >= 2000
+movies_2000s_df = m_df2[m1].copy()
+competitor_df = movies_2000s_df.groupby(['release_year', 'release_week']).agg({'competitors': 'mean'})
+high_comp_threshold = 16
+low_comp_threshold = 9
+low_mask = movies_2000s_df['competitors'] <= low_comp_threshold
+high_mask = movies_2000s_df['competitors'] >= high_comp_threshold
+low_comp_count = movies_2000s_df['is_success'][low_mask].count()
+high_comp_count = movies_2000s_df['is_success'][high_mask].count()
+print(low_comp_count, high_comp_count, movies_2000s_df['competitors'].count() - low_comp_count - high_comp_count)
 
 
-# scatter plot of perf_ratio and budget_IA
-# DONT USE THIS.....
-# fig, ax = plt.subplots(1, 1, figsize = (10,7))
-# ax.scatter(m_df2['perf_ratio'], m_df2['budget_IA'])
-# ax.set_xlim(0, 10)
-# ax.set_ylim(0, 100000000)
-# plt.savefig('images/perf_scatter.jpeg')
-# plt.close()
+fig, ax = plt.subplots(1, 1, figsize = (8,6))
+competitor_df = movies_2000s_df.groupby(['release_year', 'release_week']).agg({'competitors': 'mean'})
+ax.hist(competitor_df['competitors'], bins = 24, color = 'b', alpha = 0.5, align = 'mid')
+ax.axvline(low_comp_threshold, color = 'r', linestyle = '--', linewidth = 2)
+ax.axvline(high_comp_threshold, color = 'r', linestyle = '--', linewidth = 2)
+ax.set_title('Weeks with Competitors since 2000')
+plt.savefig('images/competitor_hist_2000.jpeg')
+plt.close()
+
+# Get the separate sets by high, mid, low competitive sets
+alpha = 0.025
+high_comp_results = movies_2000s_df['is_success'][high_mask]
+low_comp_results = movies_2000s_df['is_success'][low_mask]
+mid_comp_results = movies_2000s_df['is_success'][-low_mask & -high_mask]
+low_z_score, low_test_stat = ztest(low_comp_results, mid_comp_results, value = 0, alternative = 'larger')
+high_z_score, high_test_stat = ztest(high_comp_results, mid_comp_results, value = 0, alternative = 'smaller')
 
 # performance by genre, prime v not prime
 g_dict = {}
@@ -169,5 +188,8 @@ fig, ax = plt.subplots(1, 1, figsize = (8,6))
 ax.scatter(comp_df['competitors'], comp_df['success_rate'])
 plt.savefig('images/comp_scatter.jpeg')
 plt.close()
+
+
+
 if __name__ == '__main__':
     pass

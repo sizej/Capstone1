@@ -49,21 +49,29 @@ The difference here would be commonly conceived of as the profit:
 
 ![Total profit over the year](images/profit.jpeg)
 
-But, this doesn't really tell the whole story for a couple of reasons. First, the publicly available data for the budget of a film does not include any costs other than the production of the film itself. It excludes marketing costs (a HUGE number - commonly considered to be 75-100% of the budget of the film) and all other overhead. 
+But, this doesn't really tell the whole story for a couple of reasons. First, the publicly available data for the budget of a film does not include any costs other than the production of the film itself. It excludes marketing costs (a HUGE number - commonly considered to be 60-100% of the budget of the film) and all other overhead. 
 
 Second, wildly successful films play an outsized role in profit generation. In some ways, the movie business is resistant to analysis of raw numbers; real success is all about outliers. It only takes one *Titanic* to pay for a lot of *Sharknados*. 
 
 ![Titanic and Sharknado](images/both.jpeg)
 
-For example, the most profitable week of the year is week 50 (Christmas week). In the dataset, there are 133 films released in week 50, but **about 20% (or roughly $5B) of the total profit** of that week is attributable to two films, *Avatar* and *Star Wars: Episode VII*. Massive hits are by definition outliers (and outliers are hard to predict or analyze). 
+For example, the most profitable week of the year is week 50 (Christmas week). In the dataset, there are 133 films released in week 50, but **about 20% (or roughly $5B) of the total profit** of that week is attributable to two films, *Avatar* and *Star Wars: Episode VII*. Massive hits like these are by definition outliers (and outliers are hard to predict or analyze). 
 
-Further, even focusing on 'return' alone can be challenging. For example, *The Blair Witch Project* made ~$250M on its paltry $60k budget (roughly a 416,667% return).
+Further, even focusing on 'return' alone can be challenging. For example, *The Blair Witch Project* made ~$250M on its paltry $60k budget (roughly a 416,667% return). Analyzing returns while including these outliers would have the potential to lead us astray.
 
-Thus, for the purposes of this analysis, it makes more sense to focus on commercial success - that is, sufficient return on the investment. Using both my own experience and a small survey of people in the industry, I landed on a threshold of three times the budget in order for a film to be considered commercially successful.
+Thus, for the purposes of this analysis, it makes more sense to focus on commercial success - that is, sufficient return on the investment. Using both my own experience and a small survey of people in the industry, I landed on a threshold of three times the budget in order for a film to be considered commercially successful. Using this metric for success, I plotted the rate of success for films across the year, as well as the mean budget of the films by week, and the 'supply' or count of films per week.
 
-**The big question is whether or not seasonality drives film success more than supply, or at least whether they are close to equally important**
+![Without highlights](images/comparison.jpeg)
+
+Reviewing this, it seemed to me like there are two windows where the studios are focusing their biggest bets (i.e. two windows in which they believe the odds are best for a film to be successful). The mean budgets for these weeks are higher than average and the supply is below average.
+
+![With highlights](images/comparison_hilite.jpeg)
+
+These windows (hereafter referred to as 'prime') run from the 20th to the 32nd weeks, late May to the beginning of August, and the 47th to the 51st weeks, Thanksgiving to the end of year.  **The primary question of this analysis is what role seasonality and supply play in film success.**
 
 ## Hypothesis Test #1 - Prime Window
+
+First, I wanted to test whether or not being released in one of the prime windows has a significant effect on film success.
 
 | Status | Successes | Attempts | Success Rate |
 | --- | --- | --- | --- |
@@ -150,3 +158,4 @@ I filtered down the dataset to just films released this century, some 4600 films
 - z-score = 3.29, test_statistic = 0.0005
 
 - Reject the null - high competition films underperform middle competition films
+

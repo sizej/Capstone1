@@ -110,7 +110,7 @@ fig, ax = plt.subplots(1, 1, figsize = (8,6))
 x = np.arange(52)
 ax.bar(x, rel_week_df['total_budget'], color = 'b', alpha = 0.5, label = 'Total Budget')
 ax.set_title('Total Budget by Week')
-ax.set_yticklabels([f'${x:0.0f}M' for x in np.linspace(0, 800, 5)])
+ax.set_yticklabels([f'${x:0.0f}M' for x in np.linspace(0, 800, 9)])
 plt.tight_layout(pad = 1)
 plt.savefig('images/budget.jpeg')
 plt.close()
@@ -153,26 +153,11 @@ ax[2].axvline(pw_ends[0], color = 'r', linestyle = '--', linewidth = 2)
 ax[2].axvline(pw_starts[1], color = 'r', linestyle = '--', linewidth = 2)
 ax[2].axvline(pw_ends[1], color = 'r', linestyle = '--', linewidth = 2)
 plt.tight_layout(pad = 2)
-plt.savefig('images/comparison.jpeg')
+plt.savefig('images/comparison_hilite.jpeg')
 plt.close()
 
 # Add an is_prime flag
 m_df2['is_prime'] = m_df2.apply(lambda row: mf.determine_prime(row['release_week'], pw_starts, pw_ends), axis = 1)
-
-# # Calculate the differences between success and budget/supply
-# diff1 = rel_week_df['marg_success_rate'] - rel_week_df['mean_budget_norm'] 
-# c1 = ['g' if x > 0 else 'r' for x in diff1]
-# diff2 = rel_week_df['marg_success_rate'] - rel_week_df['supply_norm']
-# c2 = ['g' if x > 0 else 'r' for x in diff2]
-
-# # Create a horizontal bar chart for the differences....
-# fig, ax = plt.subplots(1,2, figsize = (10,14))
-# xloc = np.arange(len(rel_week_df['mean_budget_norm']))
-# ax[0].barh(xloc[::-1], diff1[::-1], align = 'center', alpha = 0.4, color = c1, label = 'Success v Budget')
-# ax[1].barh(xloc[::-1], diff2[::-1], align = 'center', alpha = 0.4, color = c2, label = 'Success v Supply')
-# plt.legend()
-# plt.savefig('images/differences.jpeg')
-# plt.close()
 
 # create competitive films column (films released week before and week after)
 m_df2['competitors'] = m_df2.apply(lambda row: mf.competitor_count(row['release_week'], row['release_year'], m_df2), axis = 1)

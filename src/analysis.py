@@ -1,6 +1,10 @@
 import scipy.stats as stats
 from statsmodels.stats.weightstats import ztest
 import pandas as pd 
+import numpy as np 
+import matplotlib.pyplot as plt
+from movies import genres
+
 
 m_df2 = pd.read_csv('data/clean_movies.csv')
 
@@ -25,7 +29,7 @@ top_2_profit = sum(m_df2['ww_gross_IA'][avatar | star_wars]) - sum(m_df2['budget
 print(top_2_profit / week_50_profit)
 
 # by decade....
-start = 1940
+start = 1970
 end = 2010
 m1 = m_df2['release_decade'] >= start
 dec = m_df2[m1].groupby(['release_decade', 'is_prime']).agg({'title': 'count',
@@ -50,14 +54,17 @@ dec = m_df2[m1].groupby(['release_year', 'is_prime']).agg({'title': 'count',
 dec['success_rate'] = dec['is_success'] / dec['title']
 
 decades = np.linspace(start, end, (end - start) + 1)
-
-fig, ax = plt.subplots(1, 1, figsize = (8,6))
-ax.plot(decades, dec['success_rate'][dec['is_prime'] == 1], color = 'b', label = 'Prime', alpha = 0.5)
-ax.plot(decades, dec['success_rate'][dec['is_prime'] == 0], color = 'r', label = 'Not Prime', alpha = 0.5)
-ax.legend()
-ax.set_title('Success Rate, Prime v Not Prime')
-ax.set_ylim(0, 1)
-plt.savefig('images/years.jpeg')
+releases = [dec['title'][dec['release_year'] == year].sum() for year in dec['release_year'].unique()]
+fig, ax = plt.subplots(1, 2, figsize = (12,6))
+ax[0].plot(decades, dec['success_rate'][dec['is_prime'] == 1], color = 'b', label = 'Prime', alpha = 0.5)
+ax[0].plot(decades, dec['success_rate'][dec['is_prime'] == 0], color = 'r', label = 'Not Prime', alpha = 0.5)
+ax[0].legend()
+ax[0].set_title('Success Rate, Prime v Not Prime')
+ax[0].set_ylim(0, 1)
+ax[1].bar(decades, releases, color = 'b', alpha = 0.5, label = 'Films per year')
+ax[1].legend()
+plt.tight_layout(pad = 2)
+plt.savefig('images/years_sr_supply.jpeg')
 plt.close()
 
 # hypothesis test #1 - does prime window mattter
@@ -189,6 +196,69 @@ ax.scatter(comp_df['competitors'], comp_df['success_rate'])
 plt.savefig('images/comp_scatter.jpeg')
 plt.close()
 
+# filter down to just big-budget films
+m1 = movies_2000s_df['budget_IA'] >= np.percentile(movies_2000s_df['budget_IA'], 75)
+big_budget_df = movies_2000s_df[m1].copy()
+big_budget_df['competitors'] = big_budget_df.apply(lambda row: mf.competitor_count(row['release_week'], row['release_year'], big_budget_df), axis = 1)
+rel_week_big_budg = big_budget_df.groupby('release_week').agg({'is_success': 'sum',
+                                                                'title': 'count',
+                                                                'budget_IA': 'mean'})
+rwd_cols = {'is_success': 'successes',
+            'title': 'supply',
+            'budget_IA': 'mean_budget'}
+rel_week_big_budg.rename(columns = rwd_cols, inplace = True)
+rel_week_big_budg['success_rate'] = rel_week_big_budg['successes'] / rel_week_big_budg['supply']
+pw_starts = [19.5, 46.5]
+pw_ends = [32.5, 51.5]
+xloc = np.arange(len(rel_week_big_budg['supply']))
+c = ['r' if ((pw_starts[0] < x < pw_ends[0]) or (pw_starts[1] < x < pw_ends[1])) else 'b' for x in xloc]
+fig, ax = plt.subplots(3,1, figsize = (14, 10))
+ax[0].bar(xloc, rel_week_big_budg['success_rate'], color = c, alpha = 0.5, label = 'Success Rate')
+ax[0].set_title('Success Rate')
+ax[0].axhline(sum(rel_week_big_budg['successes']) / sum(rel_week_big_budg['supply']), color = 'r', linestyle = '--', linewidth = 2)
+ax[0].axvline(pw_starts[0], color = 'r', linestyle = '--', linewidth = 2)
+ax[0].axvline(pw_ends[0], color = 'r', linestyle = '--', linewidth = 2)
+ax[0].axvline(pw_starts[1], color = 'r', linestyle = '--', linewidth = 2)
+ax[0].axvline(pw_ends[1], color = 'r', linestyle = '--', linewidth = 2)
+ax[1].bar(xloc, rel_week_big_budg['mean_budget'], color = c, alpha = 0.5, label = 'Mean Budget')
+ax[1].set_title('Mean Budget per Film')
+ax[1].set_yticklabels([f'${x:0.0f}M' for x in np.linspace(0, 150, 4)])
+ax[1].axhline(rel_week_big_budg['mean_budget'].mean(), color = 'r', linestyle = '--', linewidth = 2)
+ax[1].axvline(pw_starts[0], color = 'r', linestyle = '--', linewidth = 2)
+ax[1].axvline(pw_ends[0], color = 'r', linestyle = '--', linewidth = 2)
+ax[1].axvline(pw_starts[1], color = 'r', linestyle = '--', linewidth = 2)
+ax[1].axvline(pw_ends[1], color = 'r', linestyle = '--', linewidth = 2)
+ax[2].bar(xloc, rel_week_big_budg['supply'], color = c, alpha = 0.5, label = 'Count of Films Released')
+ax[2].set_title('Count of Films Released')
+ax[2].axhline(sum(rel_week_big_budg['supply']) / len(rel_week_big_budg['supply']), color = 'r', linestyle = '--', linewidth = 2)
+ax[2].axvline(pw_starts[0], color = 'r', linestyle = '--', linewidth = 2)
+ax[2].axvline(pw_ends[0], color = 'r', linestyle = '--', linewidth = 2)
+ax[2].axvline(pw_starts[1], color = 'r', linestyle = '--', linewidth = 2)
+ax[2].axvline(pw_ends[1], color = 'r', linestyle = '--', linewidth = 2)
+plt.tight_layout(pad = 2)
+plt.savefig('images/big_budg_comparison_hilite.jpeg')
+plt.close()
+
+# hypo test A - prime v not prime
+alpha = 0.05
+m1 = big_budget_df['is_prime'] == 1
+prime_results = big_budget_df['is_success'][m1]
+m2 = big_budget_df['is_prime'] == 0
+not_prime_results = big_budget_df['is_success'][m2]
+big_budg_prime_z_score, big_budg_prime_t_stat = ztest(prime_results, not_prime_results, value = 0, alternative = 'larger')
+
+# hypo test B - low, high v mid
+alpha = 0.025
+low_comp_threshold = 1
+high_comp_threshold = 5
+low_mask = big_budget_df['competitors'] <= low_comp_threshold
+high_mask = big_budget_df['competitors'] >= high_comp_threshold
+low_comp_results = big_budget_df['is_success'][low_mask]
+high_comp_results = big_budget_df['is_success'][high_mask]
+mid_comp_results = big_budget_df['is_success'][-low_mask & -high_mask]
+low_comp_z_score, low_comp_test_stat = ztest(low_comp_results, mid_comp_results, value = 0, alternative = 'larger')
+high_comp_z_score, high_comp_test_stat = ztest(high_comp_results, mid_comp_results, value = 0, alternative = 'smaller')
+print(low_comp_test_stat < alpha, high_comp_test_stat < alpha)
 
 
 if __name__ == '__main__':

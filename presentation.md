@@ -68,6 +68,7 @@ Thus, for the purposes of this analysis, I decided it made more sense to focus o
 A couple observations about this:
 1. The mean budgets for these weeks are higher than average and the supply is below average.
 2. Mean supply/count of movies are lower in the windows
+3. Success Ratea of prime window is higher than non-Prime Window.
 
 **The primary question of this analysis is what role seasonality and supply play in film success.**
 
@@ -243,3 +244,4 @@ Once again, I broke the films into three groups - low competition (0 or 1 compet
 - There is most likely some kind of confounding variable in the analysis of seasonality and competition.
 - It's possible that this is the result of both phenomenon being the result of one decision. Since both are determined by a studio, it's very difficult to untangle them.
 - Further, a film's release is a one time event and each film is a unique entity onto itself.
+- It's important to note, that it appears as though the industry has found a pretty good way to make decisions about when to release films (something I previously didn't think was the case).

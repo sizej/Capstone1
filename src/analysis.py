@@ -65,6 +65,7 @@ ax[0].set_title('Success Rate, Prime v Not Prime')
 ax[0].set_ylim(0, 1)
 ax[1].bar(decades, releases, color = 'b', alpha = 0.5, label = 'Films per year')
 ax[1].legend()
+ax[1].set_title('Films Released per Year - 1970 to 2019')
 plt.tight_layout(pad = 2)
 plt.savefig('images/years_sr_supply.jpeg')
 plt.close()
@@ -131,6 +132,15 @@ ax.axvline(high_comp_threshold, color = 'r', linestyle = '--', linewidth = 2)
 ax.set_title('Weeks with Competitors since 2000')
 plt.savefig('images/competitor_hist_2000.jpeg')
 plt.close()
+
+# prime v not prime for 2000s
+alpha = 0.05
+m1 = movies_2000s_df['is_prime'] == 1
+prime_results = movies_2000s_df['is_success'][m1]
+m2 = movies_2000s_df['is_prime'] == 0
+not_prime_results = movies_2000s_df['is_success'][m2]
+prime_2000s_ztest = HypoZtest(prime_results, not_prime_results, val = 0, alpha = alpha, alt = 'larger')
+print(f'Prime v Not Prime 2000s Result: {prime_2000s_ztest.result}.')
 
 # Get the separate sets by high, mid, low competitive sets
 alpha = 0.025
@@ -255,10 +265,26 @@ high_mask = big_budget_df['competitors'] >= high_comp_threshold
 low_comp_results = big_budget_df['is_success'][low_mask]
 high_comp_results = big_budget_df['is_success'][high_mask]
 mid_comp_results = big_budget_df['is_success'][-low_mask & -high_mask]
-big_budg_low_comp_ztest = HypoZtest(low_comp_results, mid_comp_results, alpha = 0.025, alt = 'larger')
-big_budg_high_comp_ztest = HypoZtest(high_comp_results, mid_comp_results, alpha = 0.025, alt = 'smaller')
+big_budg_low_comp_ztest = HypoZtest(low_comp_results, mid_comp_results, alpha = alpha, alt = 'larger')
+big_budg_high_comp_ztest = HypoZtest(high_comp_results, mid_comp_results, alpha = alpha, alt = 'smaller')
 print(f'Big Budget Low Comp Results: {big_budg_low_comp_ztest.result}.')
 print(f'Big Budget High Comp Results: {big_budg_high_comp_ztest.result}.')
+
+
+# paul's two hist idea
+prime_mask = movies_clean_df['is_prime'] == 1
+prime_perf_thresh = movies_clean_df['perf_ratio'] <= np.percentile(movies_clean_df['perf_ratio'][prime_mask], 95)
+not_prime_mask = movies_clean_df['is_prime'] == 0
+not_prime_perf_thresh = movies_clean_df['perf_ratio'] <= np.percentile(movies_clean_df['perf_ratio'][not_prime_mask], 95)
+fig, ax = plt.subplots(1, 2, figsize = (12,6))
+ax[0].hist(movies_clean_df['perf_ratio'][prime_mask & prime_perf_thresh], color = 'b', alpha = 0.5)
+ax[0].set_title('Bottom 95% Perf - Prime')
+ax[1].hist(movies_clean_df['perf_ratio'][not_prime_mask & not_prime_perf_thresh], color = 'b', alpha = 0.5)
+ax[1].set_title('Bottom 95% Perf - Not Prime')
+plt.tight_layout(pad = 2)
+plt.savefig('images/two_hist.jpeg')
+plt.close()
+
 
 if __name__ == '__main__':
     pass

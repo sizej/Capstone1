@@ -2,7 +2,7 @@
 
 ## Background
 
-I've been curious about seasonality and competition in the film industry for years. Is there a good reason why big budget, super-hero/action movies seem to come out mostly in the summer or during the end of the year? Are they more likely to be successful in those times of year? What effect (if any) does the competition play in film success? As a consumer, I like Fast and Furious movies just as much in February as I do July, but I only have so much time to go to the theater. When there are several movies out I want to see, I probably only get a chance to 1 or 2 of them. Does it make sense to cluster some releases in the summer and end of year? Am I am the only one annoyed by this?
+I've been curious about seasonality and competition in the film industry for years. Is there a good reason why big budget, super-hero/action movies seem to come out mostly in the summer or during the end of the year? Are they more likely to be successful in those times of year? What effect (if any) does the competition play in film success? As a consumer, I like *Fast and Furious* movies just as much in February as I do July, but I only have so much time to go to the theater. When there are several movies out I want to see, I probably only get a chance to 1 or 2 of them. Does it make sense to cluster some releases in the summer and end of year? Am I am the only one annoyed by this?
 
 Every industry contains a certain set of unwritten rules or stories that identify standard behaviors and set out what it takes to make money. In the film industry, it seems that one of the most common and pervasive of these rules is that the season in which a film is released has an outsized effect on the chances of its success. Studios have created stories (as in mental narratives that state a perspective on how the world works) about consumer behaviors and the relationship between those behaviors and the probability of success for any particular film. 
 
@@ -55,11 +55,13 @@ Second, wildly successful films play an outsized role in profit generation. In s
 
 ![Titanic and Sharknado](images/both.jpeg)
 
-For example, the most profitable week of the year is week 50 (Christmas week). In the dataset, there are 133 films released in week 50, but **about 20% (or roughly $5B) of the total profit** of that week is attributable to two films, *Avatar* and *Star Wars: Episode VII*. Massive hits like these are by definition outliers (and outliers are hard to predict or analyze). 
+ The most profitable week of the year is week 50 (Christmas week). In the dataset, there are 133 films released in week 50, but **about 20% (or roughly $5B) of the total profit** of that week is attributable to two films, *Avatar* and *Star Wars: Episode VII*. Massive hits like these are by definition outliers (and outliers are hard to predict or analyze). 
 
-Further, even focusing on 'return' alone can be challenging. For example, *The Blair Witch Project* made ~$250M on its paltry $60k budget (roughly a 416,667% return). Analyzing returns while including these outliers would have the potential to lead us astray.
+Further, even focusing on 'return' alone can be challenging. For example, *The Blair Witch Project* made ~$250M on its paltry $60k budget (roughly a 416,667% return). Analyzing returns while including these outliers would have the potential to lead us astray. Excluding the outliers, the distribution of returns is very similar:
 
-Thus, for the purposes of this analysis, it makes more sense to focus on commercial success - that is, sufficient return on the investment. Using both my own experience and a small survey of people in the industry, I landed on a threshold of three times the budget in order for a film to be considered commercially successful. Using this metric for success, I plotted the rate of success for films across the year, as well as the mean budget of the films by week, and the 'supply' or count of films per week. I was most interested in investigating the summer and winter windows. These windows (hereafter referred to as 'prime') run from the 20th to the 32nd weeks, late May to the beginning of August, and the 47th to the 51st weeks, Thanksgiving to the end of year.
+![](images/two_hist.jpeg)
+
+Thus, for the purposes of this analysis, I decided it made more sense to focus on commercial success - that is, a return that exceeds a threshold. Using both my own experience in the industry and a small survey of people in the industry, I landed on a threshold of three times the budget in order for a film to be considered commercially successful. Using this metric for success, I plotted the rate of success for films across the year, as well as the mean budget of the films by week, and the 'supply' or count of films per week. I was most interested in investigating the summer and winter windows. These windows (hereafter referred to as 'prime') run from the 20th to the 32nd weeks, late May to the beginning of August, and the 47th to the 51st weeks, Thanksgiving to the end of year.
 
 ![With highlights](images/comparison_hilite.jpeg)
 
@@ -98,7 +100,6 @@ To examine the role of supply (or competition) in film success, I used the count
 | Middle | 916 | 3287 | 0.279 |
 | High | 710 | 2886 | 0.246 |
 
-
 I then performed two hypothesis tests - low vs. middle and high vs. middle. Since I am doing two comparisons, I used an alpha of 0.025 (Bonferroni correction for an alpha of 0.05).
 
 #### Hypothesis Test #2A - Low v. Middle
@@ -121,15 +122,34 @@ I then performed two hypothesis tests - low vs. middle and high vs. middle. Sinc
 
 - Reject the null - high competition films underperform middle competition films.
 
-That seasonality and competitive set are significant is (potentially) unsurprising. The surprising thing was how significant the results were, which led me to consider why this might the case. The first thing that came to mind was time. Older films have much higher success rates:
+That seasonality and competitive set are significant is (potentially) unsurprising. The surprising thing was how significant the results were, which led me to consider why this might the case. The first thing that came to mind was time. Older films have much higher success rates and far less competition:
 
 ![Success Rate over time](images/years_sr_supply.jpeg)
 
 Indeed, the mean year for the low competititon films is 1986; for the high competition films, the mean year is 2008.
 
-## Hypthesis Test #3 - Competitive Effect - Films since 2000
+## Films since 2000
 
-I filtered down the dataset to just films released this century, some 4600 films. Same as above, I broke the dataset into three parts (low, middle, and high competitive weeks).
+I filtered the dataset down to just the films released this century, which is some 4600 films. I then performed the same hypothesis tests....
+
+#### Hypothesis Test #3 - Prime v Not Prime - Millenium Edition
+
+| Status | Successes | Attempts | Success Rate |
+| --- | --- | --- | --- |
+| Prime | 400 | 1359 | 0.294 |
+| Not Prime | 878  | 3249 | 0.27 |
+
+- Null hypothesis is that prime window success rate is equal to not prime window success rate. Alternative hypothesis is that the prime window success rate is greater than not prime.
+
+- One tailed z-test, alpha = 0.05
+
+- z-score = 1.667, test_statistic = 0.0488
+
+- Reject the null - prime window does outperfom not prime window.
+
+#### Hypothesis Test #4 - Competition - Millenium Edition
+
+I filtered down the dataset to just films released this century, some 4600 films. Same as above, I broke the dataset into three parts (low (9 or less), middle (10-15), and high (16 or more) competitive weeks).
 
 ![Histogram of Competitive Weeks](images/competitor_hist_2000.jpeg)
 
@@ -139,7 +159,7 @@ I filtered down the dataset to just films released this century, some 4600 films
 | Middle | 736 | 2610 | 0.282 |
 | High | 290 | 1267 | 0.229 |
 
-#### Hypothesis Test #3A - Low v. Mid for the 2000s
+#### Hypothesis Test #4A - Low v. Mid - Millenium Edition
 
 - Null hypothesis is that success rate of low competition films is the same as middle competition films. Alternative is that low competition films outperform middle competition films.
 
@@ -147,11 +167,19 @@ I filtered down the dataset to just films released this century, some 4600 films
 
 - z-score = 3.29, test_statistic = 0.0005
 
-- Reject the null - low competition films outperform middle competition films
+- Reject the null - low competition films outperform middle competition films.
 
-#### Hypothesis Test #3B - High v. Mid for the 2000s
+#### Hypothesis Test #4B - High v. Mid - Millenium Edition
 
-## Some conclusions......
+- Null hypothesis is that success rate of high competition films is the same as middle competition films. Alternative is that high competition films underperform middle competition films.
+
+- One tailed z-test, alpha = 0.025
+
+- z-score = -3.52, test_statistic = 0.0002
+
+- Reject the null - high competition films underperform middle competition films.
+
+## Conclusions: First Blood
 
 Though the hypothesis tests show that the prime window and the competitive set almost definitely have an effect on the success rate of a film, it's pretty clear that there are some confounding factors/overlap that prevent a cleaner analysis. Prime window releases are not exactly the same as low competition releases, but studios do seem to constrain supply during prime windows. Also, it's impossible to prove a counter-factural; we can't say movie would have different performance with a different release date. A movie can only be released once.    
 
@@ -165,7 +193,7 @@ I decided to filter down the dataset again. This time, I wanted to look only at 
 - Mean budget for prime window is ~$130M v ~$104M for not prime
 - Still seems like there is a relationship between success and season, as well as success and competition.
 
-### Hypothesis Test #1: Prime v Not Prime
+### Hypothesis Test #1: Prime v Not Prime - Heavyweight Division
 
 | Status | Successes | Attempts | Success Rate |
 | --- | --- | --- | --- |
@@ -178,9 +206,11 @@ I decided to filter down the dataset again. This time, I wanted to look only at 
 
 - z-score = 3.2, test_statistic = 0.0007
 
-- Reject the null - prime window outperforms not prime window
+- Reject the null - prime window outperforms not prime window.
 
-### Hypothesis Test #2: Competitive Effect
+### Hypothesis Test #2: Competitive Effect - Heavyweight Division
+
+Once again, I broke the films into three groups - low competition (0 or 1 competitors), mid competition (2-4 competitors) and high competition (5 or more competitors).
 
 | Competition | Successes | Attempts | Success Rate |
 | --- | --- | --- | --- |
@@ -196,7 +226,7 @@ I decided to filter down the dataset again. This time, I wanted to look only at 
 
 - z-score = 3.555, test_statistic = 0.0002
 
-- Reject the null - low competition films outperform middle competition films
+- Reject the null - low competition films outperform middle competition films.
 
 ##### Test #2B: High v. Mid
 
@@ -206,9 +236,9 @@ I decided to filter down the dataset again. This time, I wanted to look only at 
 
 - z-score = -1.322, test_statistic = 0.093
 
-- Cannot reject the null.
+- Fail to reject the null.
 
-## Conclusions Part Deux
+## Conclusions: Part Deux
 
 - There is most likely some kind of confounding variable in the analysis of seasonality and competition.
 - It's possible that this is the result of both phenomenon being the result of one decision. Since both are determined by a studio, it's very difficult to untangle them.

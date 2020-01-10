@@ -16,8 +16,8 @@ class HypoZtest(object):
         self.run_test()
         
     def run_test(self):
-        self.z_score, self.test_statistic = ztest(self.x1, self.x2, self.val, self.alt)
-        if self.test_statistic <= self.alpha:
+        self.z_score, self.p_value = ztest(self.x1, self.x2, self.val, self.alt)
+        if self.p_value <= self.alpha:
             self.result = 'reject H0'
         else:
             self.result = 'cannot reject H0'

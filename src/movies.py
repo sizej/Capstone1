@@ -16,10 +16,10 @@ plt.style.use('fivethirtyeight')
 movie_df = pd.read_csv('/Users/size/DSI/repos/Capstone1/data/movies.csv')
 m1 = movie_df['usa_gross_income'].notna()
 m2 = movie_df['budget'].notna()
-m_df = movie_df[m1 & m2].copy().reset_index()
+movies_initial_df = movie_df[m1 & m2].copy().reset_index()
 
 # renaming a few columns for ease of use
-m_df.rename(columns = {'worlwide_gross_income': 'ww_gross', 
+movies_initial_df.rename(columns = {'worlwide_gross_income': 'ww_gross', 
                         'usa_gross_income': 'usa_gross',
                         'date_published': 'release_date',
                         'actors': 'cast',
@@ -27,19 +27,19 @@ m_df.rename(columns = {'worlwide_gross_income': 'ww_gross',
                         'reviews_from_critics': 'critics_reviews'}, inplace = True)
 
 # Converting some strings to ints and datetimes
-m_df['budget'] = m_df['budget'].apply(mf.get_dollars)
-m_df['usa_gross'] = m_df['usa_gross'].apply(mf.get_dollars)
-m_df['ww_gross'] = m_df['ww_gross'].apply(mf.get_dollars)
-m_df['release_date'] = pd.to_datetime(m_df['release_date'])
+movies_initial_df['budget'] = movies_initial_df['budget'].apply(mf.get_dollars)
+movies_initial_df['usa_gross'] = movies_initial_df['usa_gross'].apply(mf.get_dollars)
+movies_initial_df['ww_gross'] = movies_initial_df['ww_gross'].apply(mf.get_dollars)
+movies_initial_df['release_date'] = pd.to_datetime(movies_initial_df['release_date'])
 
 # Break out genre into three columns
-m_df['genre'] = [x.split(', ') for x in m_df['genre']]
-genre_df = pd.DataFrame(m_df['genre'].values.tolist(), columns = ['genre1', 'genre2', 'genre3'])
-m_df = m_df.join(genre_df, how = 'left')
+movies_initial_df['genre'] = [x.split(', ') for x in movies_initial_df['genre']]
+genre_df = pd.DataFrame(movies_initial_df['genre'].values.tolist(), columns = ['genre1', 'genre2', 'genre3'])
+movies_initial_df = movies_initial_df.join(genre_df, how = 'left')
 
 # Get the set of unique genres
 g1 = []
-for x in m_df['genre']:
+for x in movies_initial_df['genre']:
     for i in x:
         g1.append(i)
 genres = set(g1)
@@ -47,37 +47,37 @@ genres = set(g1)
 # Set up dummy columns for set of genres
 for genre in genres:
     col_name = 'is_' + genre
-    m_df[col_name] = m_df.apply(lambda row: mf.genre_col(genre, row['genre']), axis = 1)
+    movies_initial_df[col_name] = movies_initial_df.apply(lambda row: mf.genre_col(genre, row['genre']), axis = 1)
 
 # calculate performance metric (ww_gross / budget)
-m1 = m_df['budget'] != 'Not US'
-m2 = m_df['release_date'] >= dt.datetime(1970, 1, 1)
-m_df2 = m_df[m1 & m2].copy()
-m_df2['perf_ratio'] = pd.to_numeric(m_df2['ww_gross'] / m_df2['budget'])
+m1 = movies_initial_df['budget'] != 'Not US'
+m2 = movies_initial_df['release_date'] >= dt.datetime(1970, 1, 1)
+movies_clean_df = movies_initial_df[m1 & m2].copy()
+movies_clean_df['perf_ratio'] = pd.to_numeric(movies_clean_df['ww_gross'] / movies_clean_df['budget'])
 success_threshold = 3
-m_df2['is_success'] = [1 if x >= success_threshold else 0 for x in m_df2['perf_ratio']]
+movies_clean_df['is_success'] = [1 if x >= success_threshold else 0 for x in movies_clean_df['perf_ratio']]
 
 # Adjust budget, ww_gross, and usa_gross for inflation
-m_df2['budget_IA'] = m_df2.apply(lambda row: mf.inflation_adjustment(row['budget'], row['release_date']), 
+movies_clean_df['budget_IA'] = movies_clean_df.apply(lambda row: mf.inflation_adjustment(row['budget'], row['release_date']), 
                                 axis = 1)
-m_df2['ww_gross_IA'] = m_df2.apply(lambda row: mf.inflation_adjustment(row['ww_gross'], row['release_date']), 
+movies_clean_df['ww_gross_IA'] = movies_clean_df.apply(lambda row: mf.inflation_adjustment(row['ww_gross'], row['release_date']), 
                                 axis = 1)
-m_df2['usa_gross_IA'] = m_df2.apply(lambda row: mf.inflation_adjustment(row['usa_gross'], row['release_date']), 
+movies_clean_df['usa_gross_IA'] = movies_clean_df.apply(lambda row: mf.inflation_adjustment(row['usa_gross'], row['release_date']), 
                                 axis = 1)
-m_df2['profit'] = m_df2['ww_gross_IA'] - m_df2['budget_IA']                            
+movies_clean_df['profit'] = movies_clean_df['ww_gross_IA'] - movies_clean_df['budget_IA']                            
 
 # get some columns to breakdown movies across various times
 # by decade, year, month, week, etc.
-m_df2['release_decade'] = [x.year // 10 * 10 for x in m_df2['release_date']]
-m_df2['release_year'] = [x.year for x in m_df2['release_date']]
-m_df2['release_month'] = [x.month for x in m_df2['release_date']]
-m_df2['release_week'] = [x.timetuple().tm_yday // 7 for x in m_df2['release_date']]
+movies_clean_df['release_decade'] = [x.year // 10 * 10 for x in movies_clean_df['release_date']]
+movies_clean_df['release_year'] = [x.year for x in movies_clean_df['release_date']]
+movies_clean_df['release_month'] = [x.month for x in movies_clean_df['release_date']]
+movies_clean_df['release_week'] = [x.timetuple().tm_yday // 7 for x in movies_clean_df['release_date']]
 # 10 films released on/about NYE, move to week 51
-m_df2['release_week'] = [x if x != 52 else 51 for x in m_df2['release_week']]
+movies_clean_df['release_week'] = [x if x != 52 else 51 for x in movies_clean_df['release_week']]
 
 
 # Group by release week or release month and compare success rate
-rel_week_df = m_df2.groupby('release_week').agg({'is_success': 'sum',
+rel_week_df = movies_clean_df.groupby('release_week').agg({'is_success': 'sum',
                                                 'title': 'count',
                                                 'budget_IA': 'sum',
                                                 'ww_gross_IA': 'sum'})
@@ -101,7 +101,7 @@ fig, ax = plt.subplots(1, 1, figsize = (8,6))
 x = np.arange(52)
 ax.bar(x, rel_week_df['total_ww_gross'], color = 'b', alpha = 0.5, label = 'WW Gross Revenue')
 ax.set_title('Worldwide Gross Revenue by Week')
-ax.set_yticklabels([f'${x:0.1f}B' for x in np.linspace(0, 3, 7)])
+ax.set_yticklabels([f'${x:0.0f}B' for x in np.linspace(0, 30, 7)])
 plt.tight_layout(pad = 1)
 plt.savefig('images/revenue.jpeg')
 plt.close()
@@ -118,7 +118,7 @@ plt.close()
 fig, ax = plt.subplots(1, 1, figsize = (8,6))
 x = np.arange(52)
 ax.bar(x, rel_week_df['total_ww_gross'] - rel_week_df['total_budget'], color = 'b', alpha = 0.5, label = 'Profit')
-ax.set_title('Total Profit by Week')
+ax.set_title('Total "Profit" by Week')
 ax.set_yticklabels([f'${x:0.0f}B' for x in np.linspace(0, 25, 6)])
 plt.tight_layout(pad = 1)
 plt.savefig('images/profit.jpeg')
@@ -157,12 +157,12 @@ plt.savefig('images/comparison_hilite.jpeg')
 plt.close()
 
 # Add an is_prime flag
-m_df2['is_prime'] = m_df2.apply(lambda row: mf.determine_prime(row['release_week'], pw_starts, pw_ends), axis = 1)
+movies_clean_df['is_prime'] = movies_clean_df.apply(lambda row: mf.determine_prime(row['release_week'], pw_starts, pw_ends), axis = 1)
 
 # create competitive films column (films released week before and week after)
-m_df2['competitors'] = m_df2.apply(lambda row: mf.competitor_count(row['release_week'], row['release_year'], m_df2), axis = 1)
+movies_clean_df['competitors'] = movies_clean_df.apply(lambda row: mf.competitor_count(row['release_week'], row['release_year'], movies_clean_df), axis = 1)
 
-m_df2.to_csv('data/clean_movies.csv')
+movies_clean_df.to_csv('data/clean_movies.csv')
 
 if __name__ == '__main__':
     pass

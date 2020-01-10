@@ -17,11 +17,11 @@ As an example of this type of behavior, per the movie tracking website The Numbe
 - Zero have been released in the month of September. Why not? It seems at least possible that there exists some pervasive belief that a kids movie can't be successful in September.
 
 # THIS IS FOR YOU KAYLA
-![Pie chart of G-rated releases](https://github.com/sizej/Capstone1/blob/master/images/forkayla.jpeg)
+![Pie chart of G-rated releases](images/forkayla.jpeg)
 
 ## The Data
 
-This dataset was scraped from IMDB. It contains over 80,000 movies from all over the world going back to 1910. For the purposes of this analysis, the salient features are:
+This dataset was scraped from IMDB (not by me -- it's available on kaggle). It contains over 80,000 movies from all over the world going back to 1910. For the purposes of this analysis, the salient features are:
 - Financials
     - Budget - how much did the film cost to produce (not including marketing or other overhead costs)
     - Worldwide Gross - how much did the film take in from theaters worldwide
@@ -210,4 +210,6 @@ I decided to filter down the dataset again. This time, I wanted to look only at 
 
 ## Conclusions Part Deux
 
-Many of the same confounding variables are still present in the big budget films, though possibly to a lesser effect. 
+- There is most likely some kind of confounding variable in the analysis of seasonality and competition.
+- It's possible that this is the result of both phenomenon being the result of one decision. Since both are determined by a studio, it's very difficult to untangle them.
+- Further, a film's release is a one time event and each film is a unique entity onto itself.

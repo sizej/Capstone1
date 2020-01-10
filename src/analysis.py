@@ -2,11 +2,13 @@ import scipy.stats as stats
 from statsmodels.stats.weightstats import ztest
 import pandas as pd 
 import numpy as np 
+import movie_func as mf 
 import matplotlib.pyplot as plt
 from movies import genres
+from hypo_test import HypoZtest
 
 
-m_df2 = pd.read_csv('data/clean_movies.csv')
+movies_clean_df = pd.read_csv('data/clean_movies.csv')
 
 
 # pie chart for fun
@@ -21,18 +23,18 @@ plt.savefig('images/forkayla.jpeg')
 plt.close('all')
 
 # what percentage of most profitable week attributable to top 2....
-m1 = m_df2['release_week'] == 50
-week_50_profit = sum(m_df2['ww_gross_IA'][m1]) - sum(m_df2['budget_IA'][m1])
-avatar = m_df2['title'] == 'Avatar'
-star_wars = m_df2['title'] == 'Star Wars: Episode VII - The Force Awakens'
-top_2_profit = sum(m_df2['ww_gross_IA'][avatar | star_wars]) - sum(m_df2['budget_IA'][avatar | star_wars])
+m1 = movies_clean_df['release_week'] == 50
+week_50_profit = sum(movies_clean_df['ww_gross_IA'][m1]) - sum(movies_clean_df['budget_IA'][m1])
+avatar = movies_clean_df['title'] == 'Avatar'
+star_wars = movies_clean_df['title'] == 'Star Wars: Episode VII - The Force Awakens'
+top_2_profit = sum(movies_clean_df['ww_gross_IA'][avatar | star_wars]) - sum(movies_clean_df['budget_IA'][avatar | star_wars])
 print(top_2_profit / week_50_profit)
 
 # by decade....
 start = 1970
 end = 2010
-m1 = m_df2['release_decade'] >= start
-dec = m_df2[m1].groupby(['release_decade', 'is_prime']).agg({'title': 'count',
+m1 = movies_clean_df['release_decade'] >= start
+dec = movies_clean_df[m1].groupby(['release_decade', 'is_prime']).agg({'title': 'count',
                                     'is_success': 'sum'}).reset_index()
 dec['success_rate'] = dec['is_success'] / dec['title']
 
@@ -48,8 +50,8 @@ plt.close()
 # by year.....
 start = 1970
 end = 2019
-m1 = m_df2['release_year'] >= start
-dec = m_df2[m1].groupby(['release_year', 'is_prime']).agg({'title': 'count',
+m1 = movies_clean_df['release_year'] >= start
+dec = movies_clean_df[m1].groupby(['release_year', 'is_prime']).agg({'title': 'count',
                                     'is_success': 'sum'}).reset_index()
 dec['success_rate'] = dec['is_success'] / dec['title']
 
@@ -69,23 +71,15 @@ plt.close()
 
 # hypothesis test #1 - does prime window mattter
 alpha = 0.05
-m1 = m_df2['is_prime'] == 1
-prime_successes = sum(m_df2['is_success'][m1])
-prime_count = m_df2['is_success'][m1].count()
-prime_success_rate = prime_successes / prime_count
-prime_results = m_df2['is_success'][m1]
-m2 = m_df2['is_prime'] == 0
-not_prime_successes = sum(m_df2['is_success'][m2])
-not_prime_count = m_df2['is_success'][m2].count()
-not_prime_success_rate = not_prime_successes / not_prime_count
-not_prime_results = m_df2['is_success'][m2]
-denom = np.sqrt((prime_success_rate * (1-prime_success_rate) / prime_count) + (not_prime_success_rate * (1-not_prime_success_rate) / not_prime_count))
-z = (prime_success_rate - not_prime_success_rate) / denom
-test_statistic = 1 - stats.norm.cdf(z, 0, 1)
-ss_z_score, ss_test_stat = ztest(prime_results, not_prime_results, value = 0, alternative = 'larger')
+m1 = movies_clean_df['is_prime'] == 1
+prime_results = movies_clean_df['is_success'][m1]
+m2 = movies_clean_df['is_prime'] == 0
+not_prime_results = movies_clean_df['is_success'][m2]
+prime_ztest = HypoZtest(prime_results, not_prime_results, val = 0, alpha = 0.05, alt = 'larger')
+print(f'Prime v Not Prime Results: {prime_ztest.result}.')
 
 # hypothesis test #2 - does a lot of competition matter - 2 comparisons low v mid, high v mid
-competitor_df = m_df2.groupby(['release_year', 'release_week']).agg({'competitors': 'mean'})
+competitor_df = movies_clean_df.groupby(['release_year', 'release_week']).agg({'competitors': 'mean'})
 high_comp_threshold = 13
 low_comp_threshold = 5
 m1 = competitor_df['competitors'] <= low_comp_threshold
@@ -106,17 +100,19 @@ plt.close()
 
 # Get the separate sets by high, mid, low competitive sets
 alpha = 0.025
-m1 = m_df2['competitors'] <= low_comp_threshold
-m2 = m_df2['competitors'] >= high_comp_threshold
-high_comp_results = m_df2['is_success'][m2]
-low_comp_results = m_df2['is_success'][m1]
-mid_comp_results = m_df2['is_success'][-m1 & -m2]
-low_z_score, low_test_stat = ztest(low_comp_results, mid_comp_results, value = 0, alternative = 'larger')
-high_z_score, high_test_stat = ztest(high_comp_results, mid_comp_results, value = 0, alternative = 'smaller')
+m1 = movies_clean_df['competitors'] <= low_comp_threshold
+m2 = movies_clean_df['competitors'] >= high_comp_threshold
+high_comp_results = movies_clean_df['is_success'][m2]
+low_comp_results = movies_clean_df['is_success'][m1]
+mid_comp_results = movies_clean_df['is_success'][-m1 & -m2]
+low_comp_ztest = HypoZtest(low_comp_results, mid_comp_results, val = 0, alpha = alpha, alt = 'larger')
+high_comp_ztest = HypoZtest(high_comp_results, mid_comp_results, val = 0, alpha = alpha, alt = 'smaller')
+print(f'Low Comp Results: {low_comp_ztest.result}.')
+print(f'High Comp Results: {high_comp_ztest.result}.')
 
 # Break out 2000s for separate hypo test
-m1 = m_df2['release_year'] >= 2000
-movies_2000s_df = m_df2[m1].copy()
+m1 = movies_clean_df['release_year'] >= 2000
+movies_2000s_df = movies_clean_df[m1].copy()
 competitor_df = movies_2000s_df.groupby(['release_year', 'release_week']).agg({'competitors': 'mean'})
 high_comp_threshold = 16
 low_comp_threshold = 9
@@ -141,22 +137,24 @@ alpha = 0.025
 high_comp_results = movies_2000s_df['is_success'][high_mask]
 low_comp_results = movies_2000s_df['is_success'][low_mask]
 mid_comp_results = movies_2000s_df['is_success'][-low_mask & -high_mask]
-low_z_score, low_test_stat = ztest(low_comp_results, mid_comp_results, value = 0, alternative = 'larger')
-high_z_score, high_test_stat = ztest(high_comp_results, mid_comp_results, value = 0, alternative = 'smaller')
+low_comp_2000s_ztest = HypoZtest(low_comp_results, mid_comp_results, val = 0, alpha = alpha, alt = 'larger')
+high_comp_2000s_ztest = HypoZtest(high_comp_results, mid_comp_results, val = 0, alpha = alpha, alt = 'smaller')
+print(f'2000s Low Comp Results: {low_comp_2000s_ztest.result}.')
+print(f'2000s High Comp Results: {high_comp_2000s_ztest.result}.')
 
 # performance by genre, prime v not prime
 g_dict = {}
 for genre in genres:
     c = 'is_' + genre
-    m1 = m_df2[c] == 1
-    m2 = m_df2['is_prime'] == 1
-    m3 = m_df2['is_prime'] == 0
-    if m_df2['title'][m1].count() > 0:
-        g_dict[genre] = {'prime': sum(m_df2['is_success'][m1 & m2]) / 
-                                    len(m_df2['title'][m1 & m2]),
-                        'not_prime': sum(m_df2['is_success'][m1 & m3]) / 
-                                    len(m_df2['title'][m1 & m3]),
-                        'mean_budget': np.mean(m_df2['budget_IA'][m1])}
+    m1 = movies_clean_df[c] == 1
+    m2 = movies_clean_df['is_prime'] == 1
+    m3 = movies_clean_df['is_prime'] == 0
+    if movies_clean_df['title'][m1].count() > 0:
+        g_dict[genre] = {'prime': sum(movies_clean_df['is_success'][m1 & m2]) / 
+                                    len(movies_clean_df['title'][m1 & m2]),
+                        'not_prime': sum(movies_clean_df['is_success'][m1 & m3]) / 
+                                    len(movies_clean_df['title'][m1 & m3]),
+                        'mean_budget': np.mean(movies_clean_df['budget_IA'][m1])}
 
 fig, ax = plt.subplots(1, 1, figsize = (12, 8))
 xloc = np.arange(len(g_dict))
@@ -187,7 +185,7 @@ plt.close()
 
 
 # get a scatter plot of competitors v success_rate
-comp_df = m_df2.groupby(['release_year', 'release_week']).agg({'competitors': 'mean',
+comp_df = movies_clean_df.groupby(['release_year', 'release_week']).agg({'competitors': 'mean',
                                                                 'is_success': 'sum',
                                                                 'title': 'count'}).reset_index()
 comp_df['success_rate'] = comp_df['is_success'] / comp_df['title']
@@ -245,7 +243,8 @@ m1 = big_budget_df['is_prime'] == 1
 prime_results = big_budget_df['is_success'][m1]
 m2 = big_budget_df['is_prime'] == 0
 not_prime_results = big_budget_df['is_success'][m2]
-big_budg_prime_z_score, big_budg_prime_t_stat = ztest(prime_results, not_prime_results, value = 0, alternative = 'larger')
+big_budg_prime_ztest = HypoZtest(prime_results, not_prime_results, alpha  = alpha, val = 0, alt = 'larger')
+print(f'Big Budget Prime v Not Prime Results: {big_budg_prime_ztest.result}.')
 
 # hypo test B - low, high v mid
 alpha = 0.025
@@ -256,10 +255,10 @@ high_mask = big_budget_df['competitors'] >= high_comp_threshold
 low_comp_results = big_budget_df['is_success'][low_mask]
 high_comp_results = big_budget_df['is_success'][high_mask]
 mid_comp_results = big_budget_df['is_success'][-low_mask & -high_mask]
-low_comp_z_score, low_comp_test_stat = ztest(low_comp_results, mid_comp_results, value = 0, alternative = 'larger')
-high_comp_z_score, high_comp_test_stat = ztest(high_comp_results, mid_comp_results, value = 0, alternative = 'smaller')
-print(low_comp_test_stat < alpha, high_comp_test_stat < alpha)
-
+big_budg_low_comp_ztest = HypoZtest(low_comp_results, mid_comp_results, alpha = 0.025, alt = 'larger')
+big_budg_high_comp_ztest = HypoZtest(high_comp_results, mid_comp_results, alpha = 0.025, alt = 'smaller')
+print(f'Big Budget Low Comp Results: {big_budg_low_comp_ztest.result}.')
+print(f'Big Budget High Comp Results: {big_budg_high_comp_ztest.result}.')
 
 if __name__ == '__main__':
     pass

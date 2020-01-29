@@ -16,9 +16,6 @@ As an example of this type of behavior, per the movie tracking website The Numbe
 - Of these films, over 43% have been released in June and November.
 - Zero have been released in the month of September. Why not? It seems at least possible that there exists some pervasive belief that a kids movie can't be successful in September.
 
-# THIS IS FOR YOU KAYLA
-![Pie chart of G-rated releases](images/forkayla.jpeg)
-
 ## The Data
 
 This dataset was scraped from IMDB (not by me -- it's available on kaggle). It contains over 80,000 movies from all over the world going back to 1910. For the purposes of this analysis, the salient features are:
